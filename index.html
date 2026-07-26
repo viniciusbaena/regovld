@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VisãoGIGOVMR</title>
+<title>VisãoREGOVLD</title>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -611,7 +611,6 @@ body{background:#f0f2f5}
   .tree-children{padding-left:15px}
 }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 
@@ -621,7 +620,7 @@ body{background:#f0f2f5}
     <div class="header-logo">
       <span class="eye">👁️</span>
       <div>
-        <h1>VisãoGIGOVMR</h1>
+        <h1>VisãoREGOVLD</h1>
         <span>Repositório de Fotos</span>
       </div>
     </div>
@@ -641,7 +640,7 @@ body{background:#f0f2f5}
 <div id="loginScreen" class="auth-screen active">
   <div class="auth-box">
     <div class="eye">👁️</div>
-    <h1>VisãoGIGOVMR</h1>
+    <h1>VisãoREGOVLD</h1>
     <p class="subtitle">Repositório de Fotos</p>
     <input type="email" id="loginEmail" placeholder="E-mail">
     <input type="password" id="loginPassword" placeholder="Senha">
@@ -656,7 +655,7 @@ body{background:#f0f2f5}
   <div class="auth-box">
     <div class="eye">👁️</div>
     <h1>Criar Conta</h1>
-    <p class="subtitle">VisãoGIGOVMR</p>
+    <p class="subtitle">VisãoREGOVLD</p>
     <input type="text" id="regName" placeholder="Nome completo">
     <input type="email" id="regEmail" placeholder="E-mail">
     <input type="password" id="regPassword" placeholder="Senha (mín. 6 caracteres)">
@@ -869,17 +868,27 @@ body{background:#f0f2f5}
 <script>
 
 // FIREBASE CONFIG
+// ============================================
+// CONFIGURAÇÃO FIREBASE — REGOVLD
+// Substitua pelas credenciais do NOVO projeto Firebase
+// Instruções no documento anexo
+// ============================================
 const firebaseConfig = {
-  apiKey: "AIzaSyBycTYSM1jgjS2zm4qaGnjDtH6JRMiw_ps",
-  authDomain: "visao-gigovmr.firebaseapp.com",
-  projectId: "visao-gigovmr",
-  storageBucket: "visao-gigovmr.firebasestorage.app",
-  messagingSenderId: "604888719510",
-  appId: "1:604888719510:web:079cc2a42fc3689d5662b7"
+  apiKey: "AIzaSyD9YUQFypaNKAiV5n-R5joKTA0AWopFJzI",
+  authDomain: "visao-regovld.firebaseapp.com",
+  projectId: "visao-regovld",
+  storageBucket: "visao-regovld.firebasestorage.app",
+  messagingSenderId: "21205149967",
+  appId: "1:21205149967:web:290082b199fcc33a8cb67a"
 };
 
+// ============================================
+// CONFIGURAÇÃO CLOUDINARY — REGOVLD
+// Substitua pelo cloud name e upload preset do NOVO projeto
+// Instruções no documento anexo
+// ============================================
 const CLOUDINARY_CLOUD = 'olfeaqsz';
-const CLOUDINARY_UPLOAD_PRESET = 'visao_gigovmr_unsigned';
+const CLOUDINARY_UPLOAD_PRESET = 'visao_regovld_unsigned';
 
 let app, auth, db;
 let currentUser = null;
@@ -1065,53 +1074,11 @@ function onObraChange(){
   }
 }
 
-
-// ============================================
-// VALIDAÇÃO DE IMAGEM
-// ============================================
-const ALLOWED_EXTENSIONS = ['jpg','jpeg','png','gif','webp','bmp','heic'];
-const ALLOWED_MIME_TYPES = ['image/jpeg','image/png','image/gif','image/webp','image/bmp','image/heic','image/heif'];
-
-async function validateImage(file){
-  const ext = file.name.split('.').pop().toLowerCase();
-  if(!ALLOWED_EXTENSIONS.includes(ext)){
-    return {valid:false, reason:'Extensão não permitida: .' + ext};
-  }
-  if(!ALLOWED_MIME_TYPES.includes(file.type)){
-    return {valid:false, reason:'Tipo de arquivo não permitido: ' + file.type};
-  }
-  // Verificar magic bytes (assinatura binária)
-  const arr = new Uint8Array(await file.slice(0, 8).arrayBuffer());
-  const isJPEG = arr[0] === 0xFF && arr[1] === 0xD8;
-  const isPNG = arr[0] === 0x89 && arr[1] === 0x50 && arr[2] === 0x4E && arr[3] === 0x47;
-  const isGIF = arr[0] === 0x47 && arr[1] === 0x49 && arr[2] === 0x46;
-  const isWEBP = arr[0] === 0x52 && arr[1] === 0x49 && arr[2] === 0x46 && arr[3] === 0x46;
-  const isBMP = arr[0] === 0x42 && arr[1] === 0x4D;
-  if(!isJPEG && !isPNG && !isGIF && !isWEBP && !isBMP){
-    return {valid:false, reason:'Arquivo não é uma imagem válida'};
-  }
-  return {valid:true};
-}
-
-async function previewPhotos(){
+function previewPhotos(){
   const input = document.getElementById('uploadPhotos');
   const preview = document.getElementById('photoPreview');
-  const files = Array.from(input.files);
-  uploadFiles = [];
+  uploadFiles = Array.from(input.files);
   preview.innerHTML = '';
-  let invalidCount = 0;
-  for(const file of files){
-    const check = await validateImage(file);
-    if(!check.valid){
-      invalidCount++;
-      showToast(file.name + ': ' + check.reason, 'error');
-      continue;
-    }
-    uploadFiles.push(file);
-  }
-  if(invalidCount > 0){
-    showToast(invalidCount + ' arquivo(s) rejeitado(s). Apenas imagens são permitidas.', 'error');
-  }
   uploadFiles.forEach((file,i)=>{
     const reader = new FileReader();
     reader.onload = e => {
@@ -1210,8 +1177,6 @@ async function submitUpload(){
 
   for(const file of uploadFiles){
     try {
-      const check = await validateImage(file);
-      if(!check.valid){ showToast(file.name + ': ' + check.reason, 'error'); continue; }
       let metadata = null;
       if(includeMetadata){
         metadata = await extractMetadata(file);
@@ -1647,41 +1612,26 @@ async function downloadSelected(){
   const photos = allPhotosCache.filter(p => selectedPhotos.has(p.id));
   if(photos.length === 0) return;
 
-  showToast('Compactando ' + photos.length + ' foto(s)...','success');
+  showToast('Baixando ' + photos.length + ' foto(s)...','success');
 
-  const zip = new JSZip();
-  const folderName = 'vistoria_' + (photos[0].cidade||'sem_cidade').replace(/\s+/g,'_') + '_' + (photos[0].date||'sem_data');
-  const folder = zip.folder(folderName);
-
-  let successCount = 0;
-  for(let i = 0; i < photos.length; i++){
-    const p = photos[i];
+  for(const p of photos){
     try {
       const res = await fetch(p.url);
       const blob = await res.blob();
-      const ext = (p.filename||'foto.jpg').split('.').pop();
-      const fileName = (p.employee||'empregado').replace(/\s+/g,'_') + '_' + (p.date||'data') + '_' + (i+1) + '.' + ext;
-      folder.file(fileName, blob);
-      successCount++;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = p.filename || 'foto.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      await new Promise(r => setTimeout(r, 300));
     } catch(e) {
       console.error('Download error:', e);
     }
   }
-
-  try {
-    const content = await zip.generateAsync({type:'blob'});
-    const url = URL.createObjectURL(content);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = folderName + '.zip';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast(successCount + ' foto(s) baixadas em ZIP!','success');
-  } catch(e) {
-    showToast('Erro ao criar ZIP','error');
-  }
+  showToast('Download concluido!','success');
 }
 
 async function updateDisplayName(){
